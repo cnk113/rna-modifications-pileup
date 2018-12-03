@@ -1,12 +1,14 @@
 import pandas as pd
 from argparse import ArgumentParser
 
+def binarySearch():
+
 def intersect(introns,psl):
     overlaps = []
     st = {}
     for row in psl.itertuples():
-        sizes = [int(n) for n in pRow.blockSizes.split(',')[:-1]]
-        starts = [int(n) for n in pRow.tStarts.split(',')[:-1]]
+        sizes = [int(n) for n in row.blockSizes.split(',')[:-1]]
+        starts = [int(n) for n in row.tStarts.split(',')[:-1]]
         exons = []
         for i in range(len(starts)):
             exons.append((starts[i],starts[i]+sizes[i]))
@@ -14,22 +16,20 @@ def intersect(introns,psl):
     for row in introns.itertuples():
         for pRow in psl.itertuples():
             if row.tName in pRow.tName and row.strand == pRow.strand:
+                exons = st.get(pRow.qName)
                 for start,end in exons: 
                     if row.strand == '+':
-                        if row.start > start and row.end > end:
-                            if end - row.start >= 5:
-                               overlaps.append([pRow.qName,row.tName,5,end])
-                        if row.start < start and row.end < end:
-                            if row.end - start >= 5:
-                               overlaps.append([pRow.qName,row.tName,3,start])
+                        prime = 5
+                        opp = 3
                     else:
-                        if row.start > start and row.end > end:
-                            if end - row.start >= 5:
-                               overlaps.append([pRow.qName,row.tName,3,end])
-                        if row.start < start and row.end < end:
-                            if row.end - start >= 5:
-                               overlaps.append([pRow.qName,row.tName,5,start])
-    for 
+                        prime = 3
+                        opp = 5
+                    if row.start < start and row.end > start:
+                        if end - row.start >= 5:
+                            overlaps.append([pRow.qName,row.tName,prime,end])
+                    if row.start < end and row.end > end:
+                        if row.end - end >= 5:
+                            overlaps.append([pRow.qName,row.tName,opp,start])
     return overlaps
 
 def parse_args():

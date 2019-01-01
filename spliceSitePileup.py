@@ -26,10 +26,10 @@ def intersect(introns,psl):
                         opp = 5
                     if intron.start > start and intron.start < end:
                         if start - intron.start >= 5:
-                            overlaps.append([pRow.qName,intron.tName,prime,end])
+                            overlaps.append([pRow.qName,intron.tName,prime,intron.start])
                     if intron.end > start and intron.end < end:
                         if end - intron.end >= 5:
-                            overlaps.append([pRow.qName,intron.tName,opp,start])
+                            overlaps.append([pRow.qName,intron.tName,opp,intron.end])
             elif pRow.tName > intron.tName:
                 break
     return overlaps
@@ -46,7 +46,7 @@ def main():
     psl = pd.read_csv(opts.psl,delim_whitespace=True,header=None,index_col=False,names=['matches','misMatches','repMatches','nCount','qNumInsert','qBaseInsert','tNumInsert','tBaseInsert','strand','qName','qSize','qStart','qEnd','tName','tSize','tStart','tEnd','blockCount','blockSizes','qStarts','tStarts'])
     overlaps = intersect(introns,psl)
     for overlap in overlaps:
-        print(overlap)
+        print(','.join(overlap))
 
 if __name__ == '__main__':
     main()

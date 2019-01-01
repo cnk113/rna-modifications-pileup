@@ -46,7 +46,7 @@ def main():
     psl = pd.read_csv(opts.psl,delim_whitespace=True,header=None,index_col=False,names=['matches','misMatches','repMatches','nCount','qNumInsert','qBaseInsert','tNumInsert','tBaseInsert','strand','qName','qSize','qStart','qEnd','tName','tSize','tStart','tEnd','blockCount','blockSizes','qStarts','tStarts'])
     overlaps = intersect(introns,psl)
     for overlap in overlaps:
-        print(','.join(overlap))
+        print(','.join(str(x) for x in overlap))
 
 if __name__ == '__main__':
     main()

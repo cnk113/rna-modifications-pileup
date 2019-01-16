@@ -6,8 +6,9 @@ def mapId(splice,runs):
     for read in runs.itertuples():
         run2read[read.read_id[:18]] = read.filename
     for overlap in splice.itertuples():
-        if run2read.get(overlap.readId) != None:
-           print(read.filename)
+        reads = run2read.get(overlap.readId)
+        if reads != None:
+           print(reads.filename)
 
 def parse_args():
     parser = ArgumentParser(description='')

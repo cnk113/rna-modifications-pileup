@@ -2,14 +2,15 @@ import pandas as pd
 from argparse import ArgumentParser
 
 def mapId(splice,runs):
+    run2read = {}
+    for read in runs.itertuples():
+        run2read[read.read_id[:18]] = read.filename
     for overlap in splice.itertuples():
-        for read in runs.itertuples():
-            if overlap.readId == read.read_id[:18]:
-                print(read.filename)
-                break
+        if run2read.get(overlap.readId) != None:
+           print(read.filename)
 
 def parse_args():
-    parser = ArgumentParser(description='gets the filenames of the reads to download')
+    parser = ArgumentParser(description='')
     parser.add_argument('-splice',help='splice sites')
     parser.add_argument('-runs',help='nanopore runs')
     return parser.parse_args()

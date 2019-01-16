@@ -18,7 +18,6 @@ def main():
     opts = parse_args()
     splice = pd.read_csv(opts.splice,delimiter=',',header=None,index_col=False,names=['readId','chr','end','pos'])
     runs = pd.read_csv(opts.runs,delim_whitespace=True)
-    print(splice)
     mapId(splice,runs)
 
 if __name__ == '__main__':

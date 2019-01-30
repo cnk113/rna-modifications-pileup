@@ -9,13 +9,13 @@ def mapId(splice,runs,links):
     with open(links, "r") as ins:
         for line in ins:
             line = line.rstrip('\n')
-            links2full[line.split('/')[-1]] = line
+            link2full[line.split('/')[-1]] = line
     for overlap in splice.itertuples():
         reads = run2read.get(overlap.readId)
         if reads != None:
            link = link2full.get(reads)
            if link != None:
-               print(','.join(overlaps.readId,overlaps.ch,overlaps.end,overlaps.pos,link))
+               print(','.join([overlap.readId,overlap.ch,str(overlap.end),str(overlap.pos),link]))
     
 
 def parse_args():

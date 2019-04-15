@@ -1,81 +1,75 @@
 '''
 Chang Kim
 '''
-
-import pandas as pd
-import numpy as np
 import re
-import textwrap
 from argparse import ArgumentParser
 
 def parse_args():
     '''
     Argument parser
-    TODO: Search for most changed base in window
     '''
     parser = ArgumentParser(description="parses pileup for mismatches")
-    parser.add_argument('-pileup', help='mpileup input')
-    parser.add_argument('-output', help='filtered mismatches output')
-    #parser.add_argument('-fasta', help='fasta output')
+    parser.add_argument('-p', help='mpileup input')
+    parser.add_argument('-c', help='coord')
     return parser.parse_args()
 
-def parsePileup(pileup,output):
+def getFreq(window):
     '''
-    Parses mpileup for mismatch reads
+    returns the highest 5mer mm and deletion freq as well as the 5mer
     '''
-    df = pd.read_csv(pileup, sep='\t', header=None, names=['ref_id','ref_pos','ref_base','coverage','read_base','qual'])
-    df = df.drop(['qual'], axis=1) # Drops useless columns
-    df = df.query('coverage >= 20') # Parses for greater than 20 depth
-    df = df[df['read_base'].str.contains('G|C')] # Removes any pileups WITHOUT mismatches (Mismatches represented through "*, +, and -")
-    #pileupList = zip(list(df['ref_pos']),list(df['coverage']),list(df['ref_base']),list(df['read_base'])) # Makes a list of tuples
-    mmList = parse(df) # Returns a list of positional mismatches
-    filtered = pd.DataFrame(mmList, columns=['chr','pos','bases','G','C','mismatches'])
-    mismatchFiltered = filtered[filtered.mismatches > .3] # Filters for greater 30% mismatch frequency
-    mismatchFiltered.to_csv(output,sep='\t',index=False) # Writes positions, mismatch frequency, reference bases. TODO: Most changed base in window
-    '''
-    baseList = zip(mismatchFiltered['pos'],mismatchFiltered['bases'])
-    f = open(fasta,'w')
-    for pos,bases in baseList: # Writes FASTA sequences of filtered positions with position as the header
-       append = ''
-       try:
-          append += df.at[int(pos)+6,'bases']
-          append += df.at[int(pos)+7,'bases']
-       except KeyError:
-          pass
-       bases += append
-       f.write('>' + str(pos) + '\n')
-       f.write(bases+'\n')
-    f.close()
-    '''
+    for i in range(len(window)):
+        mm = len(re.findall('[\*-]',window[i][4]))
+        filtered = re.sub('-[0-9]+[ACGTNacgtn]+','',window[i][4])
+        mm += len(re.findall('[ACGTNacgtn]',filtered))
+        window[i].append(mm)
+    highest = 0
+    for i in range(5):
+        mm = cov = 0
+        seq = ''
+        for row in window[i:i+5]:
+            seq += row[2]
+            cov += int(row[3])
+            mm += row[6]
+        freq = mm/cov
+        if highest <= freq:
+            highest = freq
+            highestSeq = seq
+    return highest, highestSeq
 
-def parse(pup):
-    mmList = []
-    for i in range(0,len(pup.index)-5,6):
-        sliding = pup[i:i+6]
-        window(sliding,mmList)
-    return mmList
-
-def window(sliding,mmList):
-    if int(sliding.iat[0,1])+6 > int(sliding.iat[5,1]) or sliding.iat[0,0] != sliding.iat[5,0]:
-        return
-    totalCov = sliding['coverage'].sum()
-    counts = sliding['read_base'].value_counts()
-    print(counts)
-    totalG = 0
-    totalC = 0
-    if counts.get('G') != None:
-        totalG = counts['G']
-    if counts.get('C') != None:
-        totalC = counts['C']
-    bases = ''
-    for i in range(6):
-        bases += sliding.iat[i,2]
-    totalMm = (totalG+totalC)/totalCov
-    mmList.append((sliding.iat[0,0],sliding.iat[0,1],bases,totalG,totalC,totalMm))
+def parsePileup(pup,coord):
+    sites = {}
+    with open(coord) as infile:
+        for line in infile:
+            attr = line.rstrip().split(',')
+            sites[(attr[1],attr[3])] = sites.get((attr[1],attr[3]),0) + 1 
+    for key in list(sites):
+        if sites.get(key) < 6:
+            sites.pop(key)
+    with open(pup) as infile:
+        window = []
+        hit = False
+        for line in infile:
+            col = line.rstrip().split()
+            if int(col[3]) >= 20:
+                window.append(col)
+                if len(window) > 10:
+                    window = window[1:]
+                if hit:
+                    distSite += 1
+                    if distSite == 4:
+                        freq, kmer = getFreq(window)
+                        print(ch + ',' + pos + ',' + str(freq) + ',' + kmer)
+                        hit = False
+                elif sites.get((col[0],col[1])) != None:
+                    ch = col[0]
+                    pos = col[1]
+                    distSite = 0
+                    hit = True
+                
 
 def main():
     opts = parse_args()
-    parsePileup(opts.pileup,opts.output)
+    parsePileup(opts.p,opts.c)
 
 if __name__ == '__main__':
     main()

@@ -22,7 +22,7 @@ def getFreq(window):
     for i in range(len(window)):
         filtered = re.sub('\+[0-9]+[ACGTNacgtn]+','',window[i][4])
         mm = len(re.findall('[ACGTNacgtn]',filtered))
-        mm += len(re.findall('[\*-]',filtered))
+        mm += len(re.findall('[\*\-]',filtered))
         window[i].append(mm)
     highest = 0
     for i in range(5):

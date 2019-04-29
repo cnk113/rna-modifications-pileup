@@ -27,16 +27,15 @@ def getFreq(window):
     highest = 0
     for i in range(5):
         mm = cov = 0
-        #seq = ''
         for row in window[i:i+5]:
-            #seq += row[2]
             cov += int(row[3])
             mm += row[6]
         freq = mm/cov
         if highest <= freq:
             highest = freq
-            #highestSeq = seq
-    return highest#, highestSeq
+            rawCount = mm
+            rawCov = cov
+    return highest, rawCount, rawCov
 
 def parsePileup(pup,coord,fasta):
     sites = {}
@@ -62,12 +61,12 @@ def parsePileup(pup,coord,fasta):
                 if hit:
                     distSite += 1
                     if distSite == 4:
-                        freq = getFreq(window)
+                        freq, raw, cov = getFreq(window)
                         if prime.get((ch,pos)) == '5':
                             kmer = hg38[ch][int(pos)-2:int(pos)+3].seq
                         else:
                             kmer = hg38[ch][int(pos)-3:int(pos)+2].seq
-                        print(ch + ',' + pos + ',' + str(freq) + ',' + kmer)
+                        print(ch + ',' + pos + ',' + str(freq) + ',' + str(raw) + ',' + str(cov) + ',' + kmer)
                         hit = False
                 elif sites.get((col[0],col[1])) != None:
                     ch = col[0]

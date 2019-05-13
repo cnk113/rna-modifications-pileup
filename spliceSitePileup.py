@@ -2,7 +2,6 @@ import pandas as pd
 from argparse import ArgumentParser
 
 def intersect(introns,psl):
-    overlaps = []
     st = {}
     for row in psl.itertuples():
         sizes = [int(n) for n in row.blockSizes.split(',')[:-1]]
@@ -13,10 +12,10 @@ def intersect(introns,psl):
         st[row.qName] = exons
     for intron in introns.itertuples():
         for pRow in psl.itertuples():
-            if intron.tName in pRow.tName and intron.strand == pRow.strand:
+            if intron.tName == pRow.tName and intron.strand == pRow.strand: # tName = chr
                 exons = st.get(pRow.qName)
                 for start,end in exons:
-                    if start > intron.end:
+                    if start > intron.end: # If exon is past the intron junction
                         break 
                     if intron.strand == '+':
                         prime = 5
@@ -24,15 +23,14 @@ def intersect(introns,psl):
                     else:
                         prime = 3
                         opp = 5
-                    if intron.start > start and intron.start < end:
-                        if start - intron.start >= 5:
-                            overlaps.append([pRow.qName,intron.tName,prime,intron.start])
-                    if intron.end > start and intron.end < end:
-                        if end - intron.end >= 5:
-                            overlaps.append([pRow.qName,intron.tName,opp,intron.end])
-            elif pRow.tName > intron.tName:
+                    if intron.start > start and intron.start < end: # If exon is retained in the start of an intron
+                        if start - intron.start >= 10:
+                            print(','.join(str(x) for x in [pRow.qName,intron.tName,prime,intron.start]))
+                    if intron.end > start and intron.end < end: # If exon is retained in the end of an intron
+                        if end - intron.end >= 10:
+                            print(','.join(str(x) for x in [pRow.qName,intron.tName,opp,intron.end]))
+            elif pRow.tName > intron.tName: # Assumes both files are sorted by chromosomes
                 break
-    return overlaps
 
 def parse_args():
     parser = ArgumentParser(description="")
@@ -45,8 +43,6 @@ def main():
     introns = pd.read_csv(opts.introns,delim_whitespace=True,header=None,index_col=False,names=['tName','start','end','strand'])
     psl = pd.read_csv(opts.psl,delim_whitespace=True,header=None,index_col=False,names=['matches','misMatches','repMatches','nCount','qNumInsert','qBaseInsert','tNumInsert','tBaseInsert','strand','qName','qSize','qStart','qEnd','tName','tSize','tStart','tEnd','blockCount','blockSizes','qStarts','tStarts'])
     overlaps = intersect(introns,psl)
-    for overlap in overlaps:
-        print(','.join(str(x) for x in overlap))
 
 if __name__ == '__main__':
     main()

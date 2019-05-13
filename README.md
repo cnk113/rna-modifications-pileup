@@ -16,6 +16,6 @@
 
 `removeReads.py` Removes given inputted reads from a FASTQ file and outputs the filtered reads.
 
-`spliceSitePileup.py` Deprecated.
+`spliceSitePileup.py` Takes in intron coordinates as a BED file and psl of exons and outputs to stdout intron retention sites.
 
 `subset.py` Outputs the FASTA sequence of the FAST5 reads.

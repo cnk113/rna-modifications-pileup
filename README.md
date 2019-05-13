@@ -2,9 +2,9 @@
 
 ## Scripts
 
-`downloadReads.py` Downloads raw direct RNA-seq reads from the output of mapper.py which contains downloads to each individual raw FAST5 reads.
+`downloadReads.py` Downloads raw direct RNA-seq reads from the output of mapper.py which contains downloads to each individual raw FAST5 reads. Exact position matching the splice site reads.
 
-```python downloadReads.py -reads [READS] -direct [DIRECTORY] -position [POSITION]```
+```python downloadReads.py -reads [READS] -direct [DIRECTORY] -position [chr#:##]```
 
 `generateIntrons.py` Use spliceSitePileup instead to generate intron retention events.
 
@@ -32,4 +32,6 @@
 
 ```python spliceSitePileup.py -introns [INTRONS] -psl [PSL] > [FILE]```
 
-`subset.py` Outputs the FASTA sequence of the FAST5 reads.
+`subset.py` Outputs the FASTA sequence of the FAST5 reads. Needs reference FASTA, and exact position of the reads.
+
+```python subset.py -fasta [FASTA] -reads [SPLICE] -pos [chr#:##] > [FILE]```

@@ -20,12 +20,15 @@ def main():
         for line in infile:
             col = line.rstrip().split(',')
             if kmer.get(col[2]) != None:
-                table = [[int(col[5]),int(col[6])], [int(col[8]),int(col[9])]]
-                oddsratio, pvalue = stats.fisher_exact(table)
-                col.append(kmer.get(col[2]))
-                col.append(pvalue)
-                total.append(col)
+                if float(col[4]) - float(col[7]) >= 0.05:
+                    table = [[int(col[5]),int(col[6])], [int(col[8]),int(col[9])]]
+                    oddsratio, pvalue = stats.fisher_exact(table)
+                    col.append(kmer.get(col[2]))
+                    col.append(pvalue)
+                    if pvalue <= 0.05:
+                        total.append(col)
     sp = sorted(total, key=lambda x: x[11])
+    #print("chr\tpos\tkmer\tprime\tdRNAfrequency\tdRNAmismatch\tdRNAmatch\tIVTfrequency\tIVTmismatch\tIVTmatch\tallPvalue\tpValue")
     for col in sp:
         print('\t'.join(str(x) for x in col))
 

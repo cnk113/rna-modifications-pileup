@@ -8,8 +8,8 @@ def parseArgs():
 
 def main():
     opts = parseArgs()
-    kmerMm = {}
-    kmerCov = {}
+    kmerMm = {} # mismatches
+    kmerM = {} # matches
     with open(opts.i,"r") as infile:
         for line in infile:
             col = line.rstrip().split(',')

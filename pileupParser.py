@@ -40,46 +40,33 @@ def getFreq(window):
     return highest, rawCount, matches
 
 def parsePileup(pup,coord,fasta):
-    #sites = {}
     prime = {}
     with open(coord) as infile:
         for line in infile:
             attr = line.rstrip().split(',')
-            #sites[(attr[1],attr[3])] = sites.get((attr[1],attr[3]),0) + 1 
             prime[(attr[1],attr[3])] = attr[2]
-    '''
-    for key in list(sites):
-        if sites.get(key) < 6:
-            sites.pop(key)
-    '''
     hg38 = Fasta(fasta)
     with open(pup) as infile:
         window = []
-        #hit = False
+        hit = False
         for line in infile:
             col = line.rstrip().split()
-            ch = col[0]
-            pos = col[1]
             if int(col[3]) >= 20:
                 window.append(col)
                 if len(window) > 10:
                     window = window[1:]
-                if prime.get((ch,pos)) != None:
-                    print(window)
+                if hit and int(col[1]) - int(pos) == 4:
                     freq, mismatches, matches = getFreq(window)
                     if prime.get((ch,pos)) == '5':
                         kmer = hg38[ch][int(pos)-2:int(pos)+3].seq
                     else:
                         kmer = hg38[ch][int(pos)-3:int(pos)+2].seq
                     print(ch + ',' + pos + ',' + kmer + ',' + prime.get((ch,pos)) + ',' + str(freq) + ',' + str(mismatches) + ',' + str(matches))
-                    #hit = False
-                '''
+                    hit = False
                 elif prime.get((col[0],col[1])) != None:
                     ch = col[0]
                     pos = col[1]
-                    distSite = 0
                     hit = True
-                '''
 
 def main():
     opts = parse_args()

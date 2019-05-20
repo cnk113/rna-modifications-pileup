@@ -24,10 +24,10 @@ def intersect(introns,psl):
                         prime = 3
                         opp = 5
                     if intron.start > start and intron.start < end: # If exon is retained in the start of an intron
-                        if end - intron.start >= 10:
+                        if end - intron.start >= 4:
                             print(','.join(str(x) for x in [pRow.qName,intron.tName,prime,intron.start]))
                     if intron.end > start and intron.end < end: # If exon is retained in the end of an intron
-                        if intron.end - start >= 10:
+                        if intron.end - start >= 4:
                             print(','.join(str(x) for x in [pRow.qName,intron.tName,opp,intron.end]))
             elif pRow.tName > intron.tName: # Assumes both files are sorted by chromosomes
                 break

@@ -35,3 +35,7 @@
 `subset.py` Outputs the FASTA sequence of the FAST5 reads. Needs reference FASTA, and exact position of the reads.
 
 ```python subset.py -fasta [FASTA] -reads [SPLICE] -pos [chr#:##] > [FILE]```
+
+## Data
+The current data in top directory is outputs of intermediary files of the scripts. The /splice directory contains all the ouputs from the spliceSitePileup.py with the file names as descriptors for the ends. The /pileup directory contains all the mpileup outputs. The /chr is the bed and psl files split by chromosome since spliceSitePileup.py is not parallelized yet. The /raw directory contains raw signal level data. The IVT data is in a single file, however the direct RNA is in multiple directories with variable depth directories which are split up by seperate runs, and this would require a custom directory parser to pull into a single directory. The rna-modifications-pileup directory contains all the scripts which is part of a github repo. A lot of the code needs to be refactored and some will be combined in the future. 
+
